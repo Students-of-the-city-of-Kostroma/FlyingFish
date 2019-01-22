@@ -4,8 +4,9 @@ import xml.etree.cElementTree as ET
 
 #xml = None
       
-class mainForm():
-    def selectItemOfCanvas(event):
+class MainForm():
+    
+    def selectItemOfCanvas(self, event):
         print('selectItemOfCanvas')
         global selectedItemOfCanvas
         if selectedItemOfCanvas == None:
@@ -25,45 +26,44 @@ class mainForm():
                 if dXOfItem + dYOfItem < dXOfSelectItem + dYOfSelectItem:
                     selectedItemOfCanvas = item
 
-    def moveItem(event):
+    def moveItem(self, event):
         if selectedItemOfCanvas != None:
-            x0,y0,x1,y1 = getX0Y0X1Y1OfNodeXML(selectedItemOfCanvas)
+            x0,y0,x1,y1 = self.getX0Y0X1Y1OfNodeXML(selectedItemOfCanvas)
             w2=(x1-x0)/2
             h2=(y1-y0)/2
             x0,y0,x1,y1 = event.x-w2,event.y-h2,event.x+w2,event.y+h2
-            setNodeXML(selectedItemOfCanvas,x0,y0,x1,y1)
+            self.setNodeXML(selectedItemOfCanvas,x0,y0,x1,y1)
             canvas.coords(selectedItemOfCanvas.get('id'), x0,y0,x1,y1)                        
 
-    def setNodeXML(node,x0,y0, x1, y1):
+    def setNodeXML(self, node,x0,y0, x1, y1):
         node.set('x0',str(int(x0))) 
         node.set('y0',str(int(y0)))
         node.set('x1',str(int(x1)))
         node.set('y1',str(int(y1)))
 
-    def getX0Y0X1Y1OfNodeXML(node):
+    def getX0Y0X1Y1OfNodeXML(self, node):
         return int(node.get('x0')),int(node.get('y0')),int(node.get('x1')),int(node.get('y1')),
 
-    def loadXMLProject(fileName):
+    def loadXMLProject(self, fileName):
         print('loadXMLProject')
         global xml
         root = ET.parse(fileName)
         xml = root.getroot()
 
-    def updateCanvas():
+    def updateCanvas(self):
         print('updateCanvas')
         for item in xml.iter('transition'):
-            x0,y0,x1,y1 =getX0Y0X1Y1OfNodeXML(item)
+            x0,y0,x1,y1 =self.getX0Y0X1Y1OfNodeXML(item)
             item.set('id',str(canvas.create_line(x0,y0,x1,y1)))
         for item in xml.iter('node'):
-            x0,y0,x1,y1 =getX0Y0X1Y1OfNodeXML(item)
+            x0,y0,x1,y1 =self.getX0Y0X1Y1OfNodeXML(item)
             item.set('id', str(canvas.create_oval(x0,y0,x1,y1,fill="white")))
 
 
-    def selectCircleOfCanvas(event):
+    def selectCircleOfCanvas(self, event):
         print('selectCircleOfCanvas')
 
-    @staticmethod
-    def load(): 
+    def __init__(self): 
         global canvas
         global selectedItemOfCanvas
         global xml
@@ -73,15 +73,15 @@ class mainForm():
         instrumentPanel = Frame(root, height = 25, bg = 'gray')
         circle = Canvas(instrumentPanel, height = 25, width = 25)
         circle.create_oval(2,2,24,24)
-        circle.bind('<1>', selectCircleOfCanvas)
+        circle.bind('<1>', self.selectCircleOfCanvas)
         circle.pack(side = 'left', fill = 'y')
 
         canvas = Canvas(root, height = 400, width = 600)
-        canvas.bind('<B1-Motion>', moveItem)
-        canvas.bind('<1>', selectItemOfCanvas)
+        canvas.bind('<B1-Motion>', self.moveItem)
+        canvas.bind('<1>', self.selectItemOfCanvas)
 
-        loadXMLProject(fileName=r"C:\tmp\filename.xml")
-        updateCanvas()
+        self.loadXMLProject(fileName=r"C:\tmp\filename.xml")
+        self.updateCanvas()
 
         instrumentPanel.pack(side = 'top', fill = 'x')
         canvas.pack(side = 'bottom', fill = 'both', expand = 1)

@@ -1,1 +1,0 @@
-from mainForm import *
